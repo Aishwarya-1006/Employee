@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import net.exampleproject.ems.entity.Address;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,4 +19,20 @@ public class EmployeeDto {
  private Long phno;
  private String email;
  private String password;
+
+ //Department
+ private Long deptid;
+ private String deptname;
+
+ //Address
+ private Long addid;
+ private String street;
+ private String city;
+ private String state;
+ private Long zipCode;
+
+ // List of certificates
+ private List<BasicCertificateDto> certificates;
+
+ 
 }
