@@ -1,17 +1,11 @@
 package net.exampleproject.ems.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -21,7 +15,7 @@ public class Certificate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String cname;
 
     @ManyToMany(mappedBy = "certificates")

@@ -1,15 +1,10 @@
 package net.exampleproject.ems.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import net.exampleproject.ems.entity.Address;
+import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeDto {

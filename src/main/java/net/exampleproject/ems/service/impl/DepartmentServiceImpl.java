@@ -36,7 +36,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentDto createDepartment(DepartmentDto dto) {
         // Optional: prevent duplicate department creation
-        if (departmentRepo.findByDeptnameIgnoreCase(dto.getDeptname()).isPresent()) {
+        if (departmentRepo.findFirstByDeptnameIgnoreCase(dto.getDeptname()).isPresent()) {
             throw new RuntimeException("Department already exists with name: " + dto.getDeptname());
         }
 
@@ -65,7 +65,7 @@ public class DepartmentServiceImpl implements DepartmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with ID: " + deptId));
 
         // Optional: Check if the new department name already exists
-        if (departmentRepo.findByDeptnameIgnoreCase(newDeptName).isPresent()) {
+        if (departmentRepo.findFirstByDeptnameIgnoreCase(newDeptName).isPresent()) {
             throw new RuntimeException("Department already exists with name: " + newDeptName);
         }
 

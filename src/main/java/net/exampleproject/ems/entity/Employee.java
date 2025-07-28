@@ -4,16 +4,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.exampleproject.ems.dto.AddressDto;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -38,14 +34,14 @@ public class Employee {
     //ManyToOne mapping to Department
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "deptid")
-    @JsonBackReference
+    @JsonBackReference(value = "employee-department") // Unique name
     private Department department;
 
 
     //OneToOne mapping to Address
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")
-    @JsonBackReference
+    @JsonBackReference(value = "employee-address")
     private Address address;
 
 
@@ -54,7 +50,7 @@ public class Employee {
     @JoinTable( name = "employee_certificate", joinColumns = @JoinColumn(name = "empid"),
             inverseJoinColumns = @JoinColumn(name = "certificate_id"))
 
-    @JsonBackReference
+    @JsonBackReference(value = "employee-certificates")
     private List<Certificate> certificates;
 
 }

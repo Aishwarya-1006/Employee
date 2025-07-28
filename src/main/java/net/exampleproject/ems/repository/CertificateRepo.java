@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface CertificateRepo extends JpaRepository<Certificate, Long> {
 
-    Optional<Certificate> findByCnameIgnoreCase(String certificateName);
+    Optional<Certificate> findFirstByCnameIgnoreCase(String certificateName);
 }

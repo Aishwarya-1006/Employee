@@ -14,5 +14,7 @@ public interface CertificateService {
 
     CertificateDto updateCertificate(Long cid, CertificateDto dto);
 
+    void addCertificateToEmployee(Long empId, CertificateDto certificateDto);
+
     void deleteCertificate(Long cid);
 }

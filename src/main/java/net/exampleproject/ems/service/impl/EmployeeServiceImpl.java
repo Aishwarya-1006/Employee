@@ -1,5 +1,6 @@
 package net.exampleproject.ems.service.impl;
 
+import net.exampleproject.ems.dto.BasicCertificateDto;
 import net.exampleproject.ems.dto.EmployeeDto;
 import net.exampleproject.ems.entity.Address;
 import net.exampleproject.ems.entity.Certificate;
@@ -13,6 +14,7 @@ import net.exampleproject.ems.repository.DepartmentRepo;
 import net.exampleproject.ems.repository.EmployeeRepo;
 import net.exampleproject.ems.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,6 +28,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final CertificateRepo certificateRepo;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     public EmployeeServiceImpl(EmployeeRepo employeeRepository, DepartmentRepo departmentRepo, CertificateRepo certificateRepo) {
         this.employeeRepository = employeeRepository;
         this.departmentRepo = departmentRepo;
@@ -35,18 +40,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
         EmployeeValidator.validate(employeeDto, employeeRepository, false, null);
+        employeeDto.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
 
-        // Get or create Department
-        Department dept = departmentRepo.findByDeptnameIgnoreCase(employeeDto.getDeptname())
+        Department dept = departmentRepo.findFirstByDeptnameIgnoreCase(employeeDto.getDeptname())
                 .orElseGet(() -> {
                     Department newDept = new Department();
                     newDept.setDeptname(employeeDto.getDeptname());
                     return departmentRepo.save(newDept);
                 });
 
-        // Map certificates
+
         List<Certificate> certificates = employeeDto.getCertificates().stream()
-                .map(certDto -> certificateRepo.findByCnameIgnoreCase(certDto.getCname())
+                .map(certDto -> certificateRepo.findFirstByCnameIgnoreCase(certDto.getCname())
                         .orElseGet(() -> {
                             Certificate newCert = new Certificate();
                             newCert.setCname(certDto.getCname());
@@ -74,6 +79,33 @@ public class EmployeeServiceImpl implements EmployeeService {
         return EmployeeMapper.mapToEmployeeDto(savedEmployee);
     }
 
+
+    @Override
+    public EmployeeDto addCertificatesToEmployee(Long empId, List<BasicCertificateDto> certificateDtos) {
+        Employee employee = employeeRepository.findById(empId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + empId));
+        for (BasicCertificateDto certDto : certificateDtos) {
+            Certificate certificate = certificateRepo.findFirstByCnameIgnoreCase(certDto.getCname())
+                    .orElseGet(() -> {
+                        Certificate newCert = new Certificate();
+                        newCert.setCname(certDto.getCname());
+                        return certificateRepo.save(newCert);
+                    });
+
+            // Avoid duplicate entry
+            if (!employee.getCertificates().contains(certificate)) {
+                employee.getCertificates().add(certificate);
+                certificate.getEmployees().add(employee);
+            }
+        }
+        employeeRepository.save(employee); // save only needed on owning side
+
+        return EmployeeMapper.mapToEmployeeDto(employee);
+    }
+
+
+
+
     @Override
     public EmployeeDto getEmployeeById(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -96,12 +128,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         EmployeeValidator.validate(updatedEmployee, employeeRepository, true, employeeId);
 
-        // Update core fields
+        updatedEmployee.setPassword(passwordEncoder.encode(updatedEmployee .getPassword()));
         EmployeeMapper.updateEmployeeFromDto(employee, updatedEmployee);
 
         // Update certificates
         List<Certificate> updatedCerts = updatedEmployee.getCertificates().stream()
-                .map(certDto -> certificateRepo.findByCnameIgnoreCase(certDto.getCname())
+                .map(certDto -> certificateRepo.findFirstByCnameIgnoreCase(certDto.getCname())
                         .orElseGet(() -> {
                             Certificate newCert = new Certificate();
                             newCert.setCname(certDto.getCname());
@@ -119,7 +151,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setAddress(address);
 
         // Update or create department
-        Department updatedDept = departmentRepo.findByDeptnameIgnoreCase(updatedEmployee.getDeptname())
+        Department updatedDept = departmentRepo.findFirstByDeptnameIgnoreCase(updatedEmployee.getDeptname())
                 .orElseGet(() -> {
                     Department newDept = new Department();
                     newDept.setDeptname(updatedEmployee.getDeptname());

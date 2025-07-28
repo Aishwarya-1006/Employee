@@ -1,12 +1,12 @@
 package net.exampleproject.ems.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -16,7 +16,7 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long deptid;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String deptname;
 
 

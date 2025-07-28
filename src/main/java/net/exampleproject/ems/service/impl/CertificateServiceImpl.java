@@ -6,6 +6,7 @@ import net.exampleproject.ems.entity.Employee;
 import net.exampleproject.ems.exception.ResourceNotFoundException;
 import net.exampleproject.ems.mapper.CertificateMapper;
 import net.exampleproject.ems.repository.CertificateRepo;
+import net.exampleproject.ems.repository.EmployeeRepo;
 import net.exampleproject.ems.service.CertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,34 @@ import java.util.stream.Collectors;
 
 @Service
 public class CertificateServiceImpl implements CertificateService {
+
+    @Autowired
+    private EmployeeRepo employeeRepo;
+
+    @Override
+    @Transactional
+    public void addCertificateToEmployee(Long empId, CertificateDto certificateDto) {
+        Employee employee = employeeRepo.findById(empId)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + empId));
+
+        // Check if certificate exists
+        Certificate certificate = certificateRepo.findFirstByCnameIgnoreCase(certificateDto.getCname())
+                .orElseGet(() -> {
+                    Certificate newCert = new Certificate();
+                    newCert.setCname(certificateDto.getCname());
+                    return certificateRepo.save(newCert);
+                });
+
+        // Add certificate to employee if not already present
+        if (!employee.getCertificates().contains(certificate)) {
+            employee.getCertificates().add(certificate);
+            certificate.getEmployees().add(employee); // bidirectional
+        }
+
+        employeeRepo.save(employee); // persist change
+    }
+
+
 
     private final CertificateRepo certificateRepo;
 
