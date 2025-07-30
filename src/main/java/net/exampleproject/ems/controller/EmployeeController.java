@@ -24,14 +24,12 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    private final String EMPLOYEE_CREATED = "Employee created successfully";
-    private final String EMPLOYEE_FETCHED = "Employee fetched successfully";
-    private final String ALL_EMPLOYEES_FETCHED = "All employees are fetched successfully";
-    private final String EMPLOYEE_UPDATED = "Employee updated successfully";
-    private final String EMPLOYEE_DELETED = "Employee deleted successfully";
-
-    private final String CERTIFICATE_ADDED_TO_EMPLOYEE = "Certificate added to employee successfully";
-
+    public final String EMPLOYEE_CREATED = "Employee created successfully";
+    public final String EMPLOYEE_FETCHED = "Employee fetched successfully";
+    public final String ALL_EMPLOYEES_FETCHED = "All employees are fetched successfully";
+    public final String EMPLOYEE_UPDATED = "Employee updated successfully";
+    public final String EMPLOYEE_DELETED = "Employee deleted successfully";
+    public final String CERTIFICATE_ADDED_TO_EMPLOYEE = "Certificate added to employee successfully";
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -42,171 +40,144 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepo employeeRepo;
 
+    // CREATE employee
     @PostMapping
-    public ResponseEntity<CustomResponse> createEmployee(@RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<CustomResponse<EmployeeDto>> createEmployee(@RequestBody EmployeeDto employeeDto) {
         EmployeeDto savedEmployee = employeeService.createEmployee(employeeDto);
-
         HttpStatus status = HttpStatus.CREATED;
 
-        CustomResponse response = new CustomResponse(
+        CustomResponse<EmployeeDto> response = new CustomResponse<>(
                 EMPLOYEE_CREATED,
                 savedEmployee,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
-
+    // ADD CERTIFICATE to employee
     @PostMapping("/add-certificate")
-    public ResponseEntity<CustomResponse> addCertificatesToEmployee(
+    public ResponseEntity<CustomResponse<EmployeeDto>> addCertificatesToEmployee(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody List<BasicCertificateDto> certificateDtos) {
 
-        String token = authHeader.substring(7); // Remove "Bearer "
+        String token = authHeader.substring(7);
         Long empId = jwtUtil.extractEmpId(token);
 
         EmployeeDto updatedEmployee = employeeService.addCertificatesToEmployee(empId, certificateDtos);
 
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<EmployeeDto> response = new CustomResponse<>(
                 CERTIFICATE_ADDED_TO_EMPLOYEE,
                 updatedEmployee,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return ResponseEntity.ok(updatedEmployee);
     }
 
-
+    // GET EMPLOYEE by token
     @GetMapping("/getemp")
-    public ResponseEntity<CustomResponse> getEmployeeById(@RequestHeader("Authorization") String authHeader) {
-        //EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId);
-        //return ResponseEntity.ok(employeeDto);
+    public ResponseEntity<CustomResponse<EmployeeDto>> getEmployeeById(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.substring(7);
         Long empId = jwtUtil.extractEmpId(token);
 
         EmployeeDto employee = employeeService.getEmployeeById(empId);
 
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<EmployeeDto> response = new CustomResponse<>(
                 EMPLOYEE_FETCHED,
                 employee,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return ResponseEntity.ok(employee);
     }
 
-
+    // GET ALL employees
     @GetMapping
-    public ResponseEntity<CustomResponse> getAllEmployees() {
+    public ResponseEntity<CustomResponse<List<EmployeeDto>>> getAllEmployees() {
         List<EmployeeDto> employees = employeeService.getAllEmployees();
 
         HttpStatus status = HttpStatus.OK;
-
-        CustomResponse response = new CustomResponse(
+        CustomResponse<List<EmployeeDto>> response = new CustomResponse<>(
                 ALL_EMPLOYEES_FETCHED,
                 employees,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        // return ResponseEntity.ok(employees);
     }
 
-
     @PutMapping("/putemp")
-    public ResponseEntity<CustomResponse> updateEmployee(@RequestHeader("Authorization") String authHeader,
-                                                      @RequestBody EmployeeDto updatedEmployee) {
+    public ResponseEntity<CustomResponse<EmployeeDto>> updateEmployee(@RequestHeader("Authorization") String authHeader,
+                                                                      @RequestBody EmployeeDto updatedEmployee) {
+
         String token = authHeader.substring(7);
         Long empId = jwtUtil.extractEmpId(token);
 
         EmployeeDto employeeDto = employeeService.updateEmployee(empId, updatedEmployee);
 
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<EmployeeDto> response = new CustomResponse<>(
                 EMPLOYEE_UPDATED,
                 employeeDto,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return ResponseEntity.ok(employeeDto);
     }
 
-
     @DeleteMapping("/delemp")
-    public ResponseEntity<CustomResponse> deleteEmployee(@RequestHeader("Authorization")String authHeader) {
-
-        String token = authHeader.substring(7); // Remove "Bearer "
+    public ResponseEntity<CustomResponse<Void>> deleteEmployee(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
         Long empId = jwtUtil.extractEmpId(token);
 
         employeeService.deleteEmployee(empId);
 
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<Void> response = new CustomResponse<>(
                 EMPLOYEE_DELETED,
                 null,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return ResponseEntity.ok("Employee deleted successfully!");
     }
 
-
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<CustomResponse> handleResourceNotFound(ResourceNotFoundException ex) {
-
+    public ResponseEntity<CustomResponse<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
         HttpStatus status = HttpStatus.NOT_FOUND;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<Void> response = new CustomResponse<>(
                 ex.getMessage(),
                 null,
                 false,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<CustomResponse> handleBadRequest(BadRequestException ex) {
-
+    public ResponseEntity<CustomResponse<Object>> handleBadRequest(BadRequestException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<Object> response = new CustomResponse<>(
                 "Validation failed",
                 ex.getErrors(),
                 false,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return new ResponseEntity<>(ex.getErrors(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CustomResponse> handleOtherExceptions(Exception ex) {
-
+    public ResponseEntity<CustomResponse<Void>> handleOtherExceptions(Exception ex) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<Void> response = new CustomResponse<>(
                 "Unexpected error: " + ex.getMessage(),
                 null,
                 false,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
-        //return new ResponseEntity<>("Unexpected error: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

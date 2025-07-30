@@ -49,7 +49,6 @@ public class EmployeeMapper {
                     .collect(Collectors.toList());
         }
 
-        // ✅ New Address object from flat DTO fields
         Address address = new Address();
         address.setStreet(dto.getStreet());
         address.setCity(dto.getCity());
@@ -63,7 +62,7 @@ public class EmployeeMapper {
                 dto.getEmail(),
                 dto.getPassword(),
                 null,        // Department will be set separately
-                address,     // ✅ Address set here
+                address,
                 certificates
         );
     }
@@ -74,7 +73,7 @@ public class EmployeeMapper {
         employee.setEmail(dto.getEmail());
         employee.setPassword(dto.getPassword());
 
-        // ✅ Update Address fields
+        // Update Address fields
         Address address = employee.getAddress();
         if (address == null) {
             address = new Address();
@@ -87,7 +86,7 @@ public class EmployeeMapper {
 
         employee.setAddress(address);
 
-        // ✅ Update certificates
+        // Update certificates
         if (dto.getCertificates() != null) {
             List<Certificate> certificates = dto.getCertificates().stream()
                     .map(cert -> {

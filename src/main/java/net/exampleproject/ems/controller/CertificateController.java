@@ -15,41 +15,38 @@ import java.util.List;
 @RequestMapping("/api/certificates")
 public class CertificateController {
 
-
     @Autowired
     private JwtUtil jwtUtil;
 
     @Autowired
     private CertificateService certificateService;
 
-    private final String CERTIFICATE_CREATED = "Certificate created successfully";
-    private final String CERTIFICATE_FETCHED = "Certificate fetched successfully";
-    private final String ALL_CERTIFICATE_FETCHED = "All certificates fetched successfully";
-    private final String CERTIFICATE_UPDATED = "Certificate updated successfully";
-    private final String CERTIFICATE_DELETED = "Certificate deleted successfully";
+    public final String CERTIFICATE_CREATED = "Certificate created successfully";
+    public final String CERTIFICATE_FETCHED = "Certificate fetched successfully";
+    public final String ALL_CERTIFICATE_FETCHED = "All certificates fetched successfully";
+    public final String CERTIFICATE_UPDATED = "Certificate updated successfully";
+    public final String CERTIFICATE_DELETED = "Certificate deleted successfully";
 
-    // Create a Certificate
+    // ✅ Create Certificate
     @PostMapping
-    public ResponseEntity<CustomResponse> createCertificate(@RequestBody CertificateDto certificateDTO) {
-        CertificateDto createdCertificate = certificateService.createCertificate(certificateDTO);
+    public ResponseEntity<CustomResponse<CertificateDto>> createCertificate(@RequestBody CertificateDto certificateDTO) {
+        CertificateDto created = certificateService.createCertificate(certificateDTO);
         HttpStatus status = HttpStatus.CREATED;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<CertificateDto> response = new CustomResponse<>(
                 CERTIFICATE_CREATED,
-                createdCertificate,
+                created,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
     }
 
-
-
-    // Get All Certificates
+    // ✅ Get All Certificates
     @GetMapping
-    public ResponseEntity<CustomResponse> getAllCertificates() {
+    public ResponseEntity<CustomResponse<List<CertificateDto>>> getAllCertificates() {
         List<CertificateDto> certificates = certificateService.getAllCertificates();
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<List<CertificateDto>> response = new CustomResponse<>(
                 ALL_CERTIFICATE_FETCHED,
                 certificates,
                 true,
@@ -58,44 +55,42 @@ public class CertificateController {
         return new ResponseEntity<>(response, status);
     }
 
-    // Get Certificate by ID
+    // ✅ Get Certificate by ID
     @GetMapping("/{id}")
-    public ResponseEntity<CustomResponse> getCertificateById(@PathVariable("id") Long certificateId) {
+    public ResponseEntity<CustomResponse<CertificateDto>> getCertificateById(@PathVariable("id") Long certificateId) {
         CertificateDto certificate = certificateService.getCertificateById(certificateId);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<CertificateDto> response = new CustomResponse<>(
                 CERTIFICATE_FETCHED,
                 certificate,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
     }
 
-    // Update Certificate
+    // ✅ Update Certificate
     @PutMapping("/{id}")
-    public ResponseEntity<CustomResponse> updateCertificate(
+    public ResponseEntity<CustomResponse<CertificateDto>> updateCertificate(
             @PathVariable("id") Long certificateId,
             @RequestBody CertificateDto certificateDTO) {
-        CertificateDto updatedCertificate = certificateService.updateCertificate(certificateId, certificateDTO);
+        CertificateDto updated = certificateService.updateCertificate(certificateId, certificateDTO);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<CertificateDto> response = new CustomResponse<>(
                 CERTIFICATE_UPDATED,
-                updatedCertificate,
+                updated,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
     }
 
-    // Delete Certificate
+    // ✅ Delete Certificate
     @DeleteMapping("/{id}")
-    public ResponseEntity<CustomResponse> deleteCertificate(@PathVariable("id") Long certificateId) {
+    public ResponseEntity<CustomResponse<Void>> deleteCertificate(@PathVariable("id") Long certificateId) {
         certificateService.deleteCertificate(certificateId);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<Void> response = new CustomResponse<>(
                 CERTIFICATE_DELETED,
                 null,
                 true,
@@ -104,4 +99,3 @@ public class CertificateController {
         return new ResponseEntity<>(response, status);
     }
 }
-

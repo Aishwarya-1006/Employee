@@ -1,18 +1,14 @@
 package net.exampleproject.ems.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomResponse {
+public class CustomResponse<T> {
 
     private String message;
-    private Object data;
+    private T data;
     private boolean success;
     private String status;
 }

@@ -2,7 +2,6 @@ package net.exampleproject.ems.service;
 
 import net.exampleproject.ems.dto.BasicCertificateDto;
 import net.exampleproject.ems.dto.EmployeeDto;
-
 import java.util.List;
 
 public interface EmployeeService {

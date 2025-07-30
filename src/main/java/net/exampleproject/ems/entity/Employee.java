@@ -1,12 +1,8 @@
 package net.exampleproject.ems.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
-import net.exampleproject.ems.dto.AddressDto;
-
 import java.util.List;
 
 @Data

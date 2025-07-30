@@ -17,69 +17,74 @@ public class AddressController {
 
     private final AddressService addressService;
 
-    private final String ADDRESS_CREATED = "Address created successfully";
-    private final String ADDRESS_FETCHED = "Address fetched successfully";
-    private final String ALL_ADDRESSES_FETCHED = "All addresses fetched successfully";
-    private final String ADDRESS_UPDATED = "Address updated successfully";
-    private final String ADDRESS_DELETED = "Address deleted successfully";
+    public final String ADDRESS_CREATED = "Address created successfully";
+    public final String ADDRESS_FETCHED = "Address fetched successfully";
+    public final String ALL_ADDRESSES_FETCHED = "All addresses fetched successfully";
+    public final String ADDRESS_UPDATED = "Address updated successfully";
+    public final String ADDRESS_DELETED = "Address deleted successfully";
 
+    // ✅ Create Address
     @PostMapping
-    public ResponseEntity<CustomResponse> createAddress(@RequestBody AddressDto dto) {
-        AddressDto createdaddress = addressService.createAddress(dto);
+    public ResponseEntity<CustomResponse<AddressDto>> createAddress(@RequestBody AddressDto dto) {
+        AddressDto created = addressService.createAddress(dto);
         HttpStatus status = HttpStatus.CREATED;
-        CustomResponse response = new CustomResponse(
-          ADDRESS_CREATED,
-          createdaddress,
-          true,
-          status.value() + " " + status.getReasonPhrase()
+        CustomResponse<AddressDto> response = new CustomResponse<>(
+                ADDRESS_CREATED,
+                created,
+                true,
+                status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
     }
 
+    // ✅ Get Address by ID
     @GetMapping("{id}")
-    public ResponseEntity<CustomResponse> getAddressById(@PathVariable Long id) {
+    public ResponseEntity<CustomResponse<AddressDto>> getAddressById(@PathVariable Long id) {
         AddressDto address = addressService.getAddressById(id);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<AddressDto> response = new CustomResponse<>(
                 ADDRESS_FETCHED,
                 address,
                 true,
-                status.value()+ " " + status.getReasonPhrase()
+                status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
     }
 
+    // ✅ Get All Addresses
     @GetMapping
-    public ResponseEntity<CustomResponse> getAllAddresses() {
+    public ResponseEntity<CustomResponse<List<AddressDto>>> getAllAddresses() {
         List<AddressDto> addresses = addressService.getAllAddresses();
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<List<AddressDto>> response = new CustomResponse<>(
                 ALL_ADDRESSES_FETCHED,
                 addresses,
                 true,
-                status.value()  + " " + status.getReasonPhrase()
+                status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
     }
 
+    // ✅ Update Address
     @PutMapping("{id}")
-    public ResponseEntity<CustomResponse> updateAddress(@PathVariable("id") Long id, @RequestBody AddressDto dto) {
-        AddressDto updatedAddress = addressService.updateAddress(id, dto);
+    public ResponseEntity<CustomResponse<AddressDto>> updateAddress(@PathVariable("id") Long id, @RequestBody AddressDto dto) {
+        AddressDto updated = addressService.updateAddress(id, dto);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<AddressDto> response = new CustomResponse<>(
                 ADDRESS_UPDATED,
-                updatedAddress,
+                updated,
                 true,
-                status.value()  + " "+ status.getReasonPhrase()
+                status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
     }
 
+    // ✅ Delete Address
     @DeleteMapping("{id}")
-    public ResponseEntity<CustomResponse> deleteAddress(@PathVariable("id") Long id) {
+    public ResponseEntity<CustomResponse<Void>> deleteAddress(@PathVariable("id") Long id) {
         addressService.deleteAddress(id);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+        CustomResponse<Void> response = new CustomResponse<>(
                 ADDRESS_DELETED,
                 null,
                 true,

@@ -17,17 +17,19 @@ public class DepartmentController {
 
     private final DepartmentService departmentService;
 
-    private final String DEPARTMENT_CREATED = "Department created successfully";
-    private final String DEPARTMENT_FETCHED = "Department fetched successfully";
-    private final String ALL_DEPARTMENT_FETCHED = "All department fetched successfully";
-    private final String DEPARTMENT_UPDATED = "Department updated successfully";
-    private final String DEPARTMENT_DELETED = "Department deleted successfully";
+    public final String DEPARTMENT_CREATED = "Department created successfully";
+    public final String DEPARTMENT_FETCHED = "Department fetched successfully";
+    public final String ALL_DEPARTMENT_FETCHED = "All departments fetched successfully";
+    public final String DEPARTMENT_UPDATED = "Department updated successfully";
+    public final String DEPARTMENT_DELETED = "Department deleted successfully";
 
+    // CREATE department
     @PostMapping
-    public ResponseEntity<CustomResponse> createDepartment(@RequestBody DepartmentDto dto) {
+    public ResponseEntity<CustomResponse<DepartmentDto>> createDepartment(@RequestBody DepartmentDto dto) {
         DepartmentDto created = departmentService.createDepartment(dto);
         HttpStatus status = HttpStatus.CREATED;
-        CustomResponse response = new CustomResponse(
+
+        CustomResponse<DepartmentDto> response = new CustomResponse<>(
                 DEPARTMENT_CREATED,
                 created,
                 true,
@@ -36,12 +38,13 @@ public class DepartmentController {
         return new ResponseEntity<>(response, status);
     }
 
+    // GET all departments
     @GetMapping
-    public ResponseEntity<CustomResponse> getAllDepartments() {
-
+    public ResponseEntity<CustomResponse<List<DepartmentDto>>> getAllDepartments() {
         List<DepartmentDto> departments = departmentService.getAllDepartments();
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+
+        CustomResponse<List<DepartmentDto>> response = new CustomResponse<>(
                 ALL_DEPARTMENT_FETCHED,
                 departments,
                 true,
@@ -50,11 +53,13 @@ public class DepartmentController {
         return new ResponseEntity<>(response, status);
     }
 
+    // GET department by ID
     @GetMapping("/{id}")
-    public ResponseEntity<CustomResponse> getDepartmentById(@PathVariable("id") Long id) {
+    public ResponseEntity<CustomResponse<DepartmentDto>> getDepartmentById(@PathVariable("id") Long id) {
         DepartmentDto department = departmentService.getDepartmentById(id);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+
+        CustomResponse<DepartmentDto> response = new CustomResponse<>(
                 DEPARTMENT_FETCHED,
                 department,
                 true,
@@ -63,12 +68,13 @@ public class DepartmentController {
         return new ResponseEntity<>(response, status);
     }
 
-
+    // DELETE department
     @DeleteMapping("/{id}")
-    public ResponseEntity<CustomResponse> deleteDepartment(@PathVariable("id") Long id) {
+    public ResponseEntity<CustomResponse<Void>> deleteDepartment(@PathVariable("id") Long id) {
         departmentService.deleteDepartment(id);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+
+        CustomResponse<Void> response = new CustomResponse<>(
                 DEPARTMENT_DELETED,
                 null,
                 true,
@@ -77,21 +83,20 @@ public class DepartmentController {
         return new ResponseEntity<>(response, status);
     }
 
+    // UPDATE department name
     @PutMapping("/{deptId}/name")
-    public ResponseEntity<CustomResponse> updateDeptName(
+    public ResponseEntity<CustomResponse<DepartmentDto>> updateDeptName(
             @PathVariable Long deptId,
             @RequestParam String newDeptName) {
         DepartmentDto updatedDept = departmentService.updateDepartmentName(deptId, newDeptName);
         HttpStatus status = HttpStatus.OK;
-        CustomResponse response = new CustomResponse(
+
+        CustomResponse<DepartmentDto> response = new CustomResponse<>(
                 DEPARTMENT_UPDATED,
                 updatedDept,
                 true,
                 status.value() + " " + status.getReasonPhrase()
         );
         return new ResponseEntity<>(response, status);
-
     }
-
-
 }
